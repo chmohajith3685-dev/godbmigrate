@@ -1,29 +1,29 @@
 # godbmigrate
 
-Um motor de engenharia simples e eficiente para gerenciar migrações de banco de dados em Go.
+A simple and efficient database migration engine for Go projects.
 
-## Instalação
+## Installation
 
 ```bash
-go get github.com/lucassousa/godbmigrate
+go get github.com/ESousa97/godbmigrate
 ```
 
-## Como usar
+## Usage
 
-### Criar uma nova migração
+### Create a New Migration
 ```bash
-godbmigrate new <nome_da_migracao>
+godbmigrate new <migration_name>
 ```
 
-Isso gerará dois arquivos na pasta `migrations/`:
-- `YYYYMMDDHHMMSS_<nome>.up.sql`
-- `YYYYMMDDHHMMSS_<nome>.down.sql`
+This will generate two files in the `migrations/` directory:
+- `YYYYMMDDHHMMSS_<name>.up.sql`
+- `YYYYMMDDHHMMSS_<name>.down.sql`
 
-### Listar migrações
+### List Migrations
 ```bash
 godbmigrate list
 ```
 
-## Tecnologias
+## Technologies
 - Go (Golang)
 - Cobra CLI
