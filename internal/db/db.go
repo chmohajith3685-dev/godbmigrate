@@ -58,6 +58,31 @@ func (s *MigrationStore) GetLatestVersion() (int64, error) {
 	return version, nil
 }
 
+func (s *MigrationStore) ApplyMigration(version int64, sqlContent string) error {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("could not start transaction: %w", err)
+	}
+
+	// Execute migration SQL
+	if _, err := tx.Exec(sqlContent); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to execute migration: %w", err)
+	}
+
+	// Record the migration
+	if _, err := tx.Exec("INSERT INTO schema_migrations (version) VALUES ($1)", version); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to record migration version: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}
+
 func (s *MigrationStore) Close() error {
 	return s.DB.Close()
 }

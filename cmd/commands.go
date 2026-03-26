@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -109,8 +111,89 @@ var statusCmd = &cobra.Command{
 	},
 }
 
+type migrationFile struct {
+	version int64
+	name    string
+	path    string
+}
+
+var upCmd = &cobra.Command{
+	Use:   "up",
+	Short: "Apply all pending migrations",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := initDB(); err != nil {
+			return err
+		}
+		defer store.Close()
+
+		currentVersion, err := store.GetLatestVersion()
+		if err != nil {
+			return err
+		}
+
+		files, err := os.ReadDir(migrationsDir)
+		if err != nil {
+			return fmt.Errorf("could not read migrations directory: %w", err)
+		}
+
+		var pending []migrationFile
+		for _, f := range files {
+			if f.IsDir() || !strings.HasSuffix(f.Name(), ".up.sql") {
+				continue
+			}
+
+			parts := strings.Split(f.Name(), "_")
+			if len(parts) < 2 {
+				continue
+			}
+
+			version, err := strconv.ParseInt(parts[0], 10, 64)
+			if err != nil {
+				continue
+			}
+
+			if version > currentVersion {
+				pending = append(pending, migrationFile{
+					version: version,
+					name:    f.Name(),
+					path:    filepath.Join(migrationsDir, f.Name()),
+				})
+			}
+		}
+
+		sort.Slice(pending, func(i, j int) bool {
+			return pending[i].version < pending[j].version
+		})
+
+		if len(pending) == 0 {
+			fmt.Println("No pending migrations to apply.")
+			return nil
+		}
+
+		for _, m := range pending {
+			fmt.Printf("Applying migration: %s... ", m.name)
+
+			content, err := os.ReadFile(m.path)
+			if err != nil {
+				return fmt.Errorf("could not read migration file %s: %w", m.name, err)
+			}
+
+			if err := store.ApplyMigration(m.version, string(content)); err != nil {
+				fmt.Println("FAILED")
+				return err
+			}
+
+			fmt.Println("OK")
+		}
+
+		fmt.Println("All pending migrations applied successfully.")
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(newCmd)
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(statusCmd)
+	rootCmd.AddCommand(upCmd)
 }
