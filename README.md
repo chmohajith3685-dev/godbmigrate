@@ -1,20 +1,25 @@
-# godbmigrate
+<div align="center">
+  <h1>godbmigrate</h1>
+  <p>A fast, flexible, and database-agnostic migration tool for Go projects.</p>
 
-> A fast, flexible, and database-agnostic migration tool for Go projects.
+  <img src="assets/github-go.png" alt="godbmigrate Banner" width="600px">
 
-![Go](https://img.shields.io/badge/Language-Go-00ADD8?style=flat&logo=go&logoColor=white)
-![Build Status](https://github.com/ESousa97/godbmigrate/actions/workflows/ci.yml/badge.svg?branch=master)
+  <br>
+
+[![CI](https://img.shields.io/github/actions/workflow/status/ESousa97/godbmigrate/ci.yml?branch=master&label=CI&logo=github)](https://github.com/ESousa97/godbmigrate/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ESousa97/godbmigrate)](https://goreportcard.com/report/github.com/ESousa97/godbmigrate)
-![Go Reference](https://pkg.go.dev/badge/github.com/ESousa97/godbmigrate.svg)
-![License](https://img.shields.io/github/license/ESousa97/godbmigrate)
-![Go Version](https://img.shields.io/github/go-mod/go-version/ESousa97/godbmigrate)
-![Last Commit](https://img.shields.io/github/last-commit/ESousa97/godbmigrate)
+[![Go Reference](https://pkg.go.dev/badge/github.com/ESousa97/godbmigrate.svg)](https://pkg.go.dev/github.com/ESousa97/godbmigrate)
+[![License: MIT](https://img.shields.io/github/license/ESousa97/godbmigrate?color=blue)](https://github.com/ESousa97/godbmigrate/blob/master/LICENSE)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/ESousa97/godbmigrate)](https://github.com/ESousa97/godbmigrate)
+[![Last Commit](https://img.shields.io/github/last-commit/ESousa97/godbmigrate)](https://github.com/ESousa97/godbmigrate/commits/master)
+
+</div>
 
 ---
 
-godbmigrate is a lightweight CLI tool and Go library designed to handle database migrations with ease. It supports PostgreSQL out-of-the-box and focuses on simplicity, speed, and safety through advisory locks.
+`godbmigrate` is a lightweight CLI tool and Go library designed to handle database migrations with ease. It supports PostgreSQL out-of-the-box and focuses on simplicity, speed, and safety through advisory locks to prevent concurrent execution in distributed environments.
 
-## Demonstração
+## Demonstration
 
 ### CLI Usage
 
@@ -39,7 +44,9 @@ store, err := db.Connect(dsn)
 if err != nil {
     log.Fatal(err)
 }
-defer store.Close()
+defer func() {
+    _ = store.Close()
+}()
 
 // Apply pending migrations
 if err := store.ApplyMigration(version, sqlContent); err != nil {
@@ -47,84 +54,99 @@ if err := store.ApplyMigration(version, sqlContent); err != nil {
 }
 ```
 
-## Stack Tecnológico
+## Tech Stack
 
-| Tecnologia | Papel |
+| Technology | Role |
 |---|---|
-| Go | Linguagem de programação principal |
-| Cobra | Framework para criação de CLI |
-| PostgreSQL | Banco de dados alvo (suporte inicial) |
-| Slog | Logging estruturado nativo |
+| Go 1.25 | Core language and concurrent execution |
+| Cobra | Framework for creation of powerful CLI applications |
+| PostgreSQL | Target database (initial support) |
+| Slog | Native structured logging for Go |
+| Advisory Locks | Distributed lock mechanism for safe migrations |
 
-## Pré-requisitos
+## Prerequisites
 
-- Go >= 1.25.0
-- PostgreSQL (ou Docker para rodar via Makefile)
+- Go >= 1.25.0 (defined in `go.mod`)
+- PostgreSQL (or Docker for local setup)
+- Network tools (curl)
 
-## Instalação e Uso
+## Installation and Usage
 
-### Como binário
+### As a Binary
 
 ```bash
 go install github.com/ESousa97/godbmigrate@latest
 ```
 
-### A partir do source
+### From Source
 
 ```bash
 git clone https://github.com/ESousa97/godbmigrate.git
 cd godbmigrate
 make build
-# Configure suas variáveis no Makefile ou via flags
-make test-full
+# make test-full
 ```
 
 ## Makefile Targets
 
-| Target | Descrição |
+| Target | Description |
 |---|---|
-| `build` | Compila o binário `godbmigrate.exe` |
-| `db-up` | Inicia um container PostgreSQL via Docker |
-| `db-down` | Para e remove o container PostgreSQL |
-| `test-full` | Executa um ciclo completo de teste (build, new, up, status, down) |
-| `clean` | Remove binários e diretório de migrations temporárias |
+| `make build` | Compiles the binary to `godbmigrate.exe` |
+| `make db-up` | Starts a PostgreSQL container via Docker |
+| `make db-down` | Stops and removes the PostgreSQL container |
+| `make test-full` | Executes a complete test cycle (build, new, up, status, down) |
+| `make clean` | Removes binaries and temporary migration files |
 
-## Arquitetura
+## Architecture
 
-O projeto segue uma estrutura modular simples:
-- `cmd/`: Define a interface CLI usando Cobra.
-- `internal/db/`: Contém a lógica de persistência e execução de SQL.
-- `migrations/`: Diretório padrão para os arquivos `.up.sql` e `.down.sql`.
+The project adopts a modular architecture focused on safety and simplicity:
 
-Utiliza **Advisory Locks** do PostgreSQL para garantir que apenas um processo de migração execute por vez, evitando condições de corrida em ambientes distribuídos.
+- **`cmd/`**: CLI interface and application bootstrapping using Cobra.
+- **`internal/db/`**: Core logic containing the `MigrationStore` and SQL execution.
+- **`Advisory Locks`**: PostgreSQL-native distributed locks ensuring single-process execution.
+- **`Schema Tracking`**: Automated management of the `schema_migrations` table.
 
 ## API Reference
 
-Veja a documentação completa em [pkg.go.dev](https://pkg.go.dev/github.com/ESousa97/godbmigrate).
+Detailed documentation of the internal packages and structures can be found at [pkg.go.dev](https://pkg.go.dev/github.com/ESousa97/godbmigrate).
 
-## Configuração
+## Configuration
 
-| Variável | Descrição | Tipo | Padrão |
+| Variable | Description | Type | Default |
 |---|---|---|---|
-| `--dsn` | String de conexão PostgreSQL | string | `postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable` |
-| `--debug` | Habilita logs em nível DEBUG | bool | `false` |
+| `--dsn` | PostgreSQL connection string | string | `postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable` |
+| `--debug` | Enables DEBUG level logs | bool | `false` |
 
 ## Roadmap
 
-- [x] Suporte básico para PostgreSQL
-- [x] Advisory Locks para concorrência
-- [ ] Suporte para MySQL e SQLite
-- [ ] Migrações programáticas em Go (além de SQL)
-- [ ] Integração com CI/CD (GitHub Actions)
+- [x] Phase 1: PostgreSQL Basic Support
+- [x] Phase 2: Advisory Locks & Concurrency Control
+- [ ] Phase 3: Multiple Database Support (MySQL, SQLite)
+- [ ] Phase 4: Programmatic Go Migrations
+- [ ] Phase 5: Advanced CI/CD Integration & Linting
 
-## Contribuindo
+## Contributing
 
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes sobre como abrir PRs e seguir padrões de código.
+Contributions are welcome! See the full guide at [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Licença
+## License
 
-Distribuído sob a licença MIT. Veja [LICENSE](LICENSE) para mais informações.
+Distributed under the MIT license. See [LICENSE](LICENSE) for more details.
 
-## Autor
+<div align="center">
 
-Enoque Sousa - [Portfólio](https://enoquesousa.vercel.app) - [GitHub](https://github.com/ESousa97)
+## Author
+
+**Enoque Sousa**
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/enoque-sousa-bb89aa168/)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/ESousa97)
+[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=flat&logo=target&logoColor=white)](https://enoquesousa.vercel.app)
+
+**[⬆ Back to top](#godbmigrate)**
+
+Made with ❤️ by [Enoque Sousa](https://github.com/ESousa97)
+
+**Project Status:** Active — Study Project
+
+</div>
