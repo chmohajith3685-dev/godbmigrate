@@ -32,7 +32,7 @@ godbmigrate down --dsn "postgres://user:pass@localhost:5432/dbname?sslmode=disab
 ### Library Usage
 
 ```go
-import "github.com/lucassousa/godbmigrate/internal/db"
+import "github.com/ESousa97/godbmigrate/internal/db"
 
 // Connect to the database
 store, err := db.Connect(dsn)

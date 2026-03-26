@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/lucassousa/godbmigrate/cmd"
+	"github.com/ESousa97/godbmigrate/cmd"
 )
 
 func main() {

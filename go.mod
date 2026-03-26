@@ -1,4 +1,4 @@
-module github.com/lucassousa/godbmigrate
+module github.com/ESousa97/godbmigrate
 
 go 1.25.0
 

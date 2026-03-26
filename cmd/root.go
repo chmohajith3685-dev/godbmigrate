@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/lucassousa/godbmigrate/internal/db"
+	"github.com/ESousa97/godbmigrate/internal/db"
 	"github.com/spf13/cobra"
 )
 
